@@ -16,6 +16,7 @@ import type { Options, Plugin } from "prettier";
 
 const CACHES = {
   prettier: null as typeof import("prettier") | null,
+  fluentPlugin: null as Plugin | null,
   sveltePlugin: null as Plugin | null,
   tailwindPlugin: null as typeof import("prettier-plugin-tailwindcss") | null,
   tailwindSorter: null as typeof import("prettier-plugin-tailwindcss/sorter") | null,
@@ -85,6 +86,8 @@ export async function formatFile({ code, options }: FormatFileParam): Promise<st
   const prettier = CACHES.prettier ?? (await loadPrettier());
 
   // NOTE: Plugins order matters here!
+  // This plugin adds the `fluent-parse` parser to support `.ftl` files.
+  if (options.parser === "fluent-parse") await setupFluentPlugin(options);
   // This plugin add `svelte` parser to support for `.svelte` files, and is also needed for `svelte-in-md` to work
   if ("_useSveltePlugin" in options) await setupSveltePlugin(options);
   // Enable Tailwind CSS plugin, this plugin transforms `parsers` already installed by prior plugins
@@ -193,6 +196,22 @@ export async function formatEmbeddedDoc({
       });
     }),
   );
+}
+
+// ---
+// Fluent plugin support
+// ---
+
+/**
+ * Load the local Fluent plugin to provide the `fluent-parse` parser.
+ */
+async function setupFluentPlugin(options: Options): Promise<void> {
+  CACHES.fluentPlugin ??= await loadCached(
+    "fluentPlugin",
+    async () => (await import("./prettier-plugin-fluent/index")) as Plugin,
+  );
+  options.plugins ??= [];
+  options.plugins.push(CACHES.fluentPlugin);
 }
 
 // ---

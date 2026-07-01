@@ -46,6 +46,7 @@ export default defineConfig({
       "prettier-plugin-tailwindcss",
       "prettier-plugin-tailwindcss/sorter",
       "prettier-plugin-svelte",
+      "@fluent/syntax",
 
       // Cannot bundle: `cli-worker.js` runs in separate thread and can't resolve bundled chunks
       // Be sure to add it to "dependencies" in `npm/oxfmt/package.json`!

@@ -366,6 +366,11 @@ static CSS_EXTENSIONS: phf::Set<&'static str> = phf_set! {
 /// See also `prettier --support-info | jq '.languages[]'`
 #[cfg(feature = "napi")]
 fn get_external_parser_name(file_name: &str, extension: Option<&str>) -> Option<&'static str> {
+    // Fluent
+    if extension == Some("ftl") {
+        return Some("fluent-parse");
+    }
+
     // YAML
     if YAML_FILENAMES.contains(file_name) {
         return Some("yaml");
@@ -642,6 +647,8 @@ mod tests {
             ("schema.graphql", None),
             ("query.gql", None),
             ("types.graphqls", None),
+            // Fluent
+            ("messages.ftl", Some("fluent-parse")),
             // Handlebars
             ("template.handlebars", Some("glimmer")),
             ("partial.hbs", Some("glimmer")),
@@ -668,6 +675,23 @@ mod tests {
             let result = get_parser_name(file_name);
             assert_eq!(result, expected, "`{file_name}` should be parsed as {expected:?}");
         }
+    }
+
+    #[test]
+    #[cfg(feature = "napi")]
+    fn test_fluent_files_route_to_external_formatter() {
+        let result = classify_file_kind(Arc::from(Path::new("messages.ftl")));
+        assert!(
+            matches!(result, Some(FileKind::ExternalFormatter { parser_name: "fluent-parse", .. })),
+            "`messages.ftl` should be routed to the Fluent external formatter"
+        );
+    }
+
+    #[test]
+    #[cfg(not(feature = "napi"))]
+    fn test_fluent_files_require_napi() {
+        let result = classify_file_kind(Arc::from(Path::new("messages.ftl")));
+        assert!(result.is_none(), "Fluent files require the NAPI external formatter");
     }
 
     #[test]
