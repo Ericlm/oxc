@@ -1134,6 +1134,17 @@ impl RuleRunner for crate::rules::eslint::no_unreachable::NoUnreachable {
     const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::RunOnce;
 }
 
+impl RuleRunner for crate::rules::eslint::no_unreachable_loop::NoUnreachableLoop {
+    const NODE_TYPES: Option<&AstTypesBitset> = Some(&AstTypesBitset::from_types(&[
+        AstType::DoWhileStatement,
+        AstType::ForInStatement,
+        AstType::ForOfStatement,
+        AstType::ForStatement,
+        AstType::WhileStatement,
+    ]));
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
+}
+
 impl RuleRunner for crate::rules::eslint::no_unsafe_finally::NoUnsafeFinally {
     const NODE_TYPES: Option<&AstTypesBitset> = Some(&AstTypesBitset::from_types(&[
         AstType::BreakStatement,
@@ -1514,7 +1525,7 @@ impl RuleRunner
 {
     const NODE_TYPES: Option<&AstTypesBitset> =
         Some(&AstTypesBitset::from_types(&[AstType::ClassBody]));
-    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Unknown;
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
 }
 
 impl RuleRunner
@@ -1739,7 +1750,7 @@ impl RuleRunner for crate::rules::typescript::no_inferrable_types::NoInferrableT
 impl RuleRunner for crate::rules::typescript::no_invalid_void_type::NoInvalidVoidType {
     const NODE_TYPES: Option<&AstTypesBitset> =
         Some(&AstTypesBitset::from_types(&[AstType::TSVoidKeyword]));
-    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Unknown;
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
 }
 
 impl RuleRunner
@@ -2914,23 +2925,27 @@ impl RuleRunner for crate::rules::react::void_dom_elements_no_children::VoidDomE
 }
 
 impl RuleRunner for crate::rules::react_perf::jsx_no_jsx_as_prop::JsxNoJsxAsProp {
-    const NODE_TYPES: Option<&AstTypesBitset> = None;
-    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Unknown;
+    const NODE_TYPES: Option<&AstTypesBitset> =
+        Some(&AstTypesBitset::from_types(&[AstType::JSXAttribute]));
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
 }
 
 impl RuleRunner for crate::rules::react_perf::jsx_no_new_array_as_prop::JsxNoNewArrayAsProp {
-    const NODE_TYPES: Option<&AstTypesBitset> = None;
-    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Unknown;
+    const NODE_TYPES: Option<&AstTypesBitset> =
+        Some(&AstTypesBitset::from_types(&[AstType::JSXAttribute]));
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
 }
 
 impl RuleRunner for crate::rules::react_perf::jsx_no_new_function_as_prop::JsxNoNewFunctionAsProp {
-    const NODE_TYPES: Option<&AstTypesBitset> = None;
-    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Unknown;
+    const NODE_TYPES: Option<&AstTypesBitset> =
+        Some(&AstTypesBitset::from_types(&[AstType::JSXAttribute]));
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
 }
 
 impl RuleRunner for crate::rules::react_perf::jsx_no_new_object_as_prop::JsxNoNewObjectAsProp {
-    const NODE_TYPES: Option<&AstTypesBitset> = None;
-    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Unknown;
+    const NODE_TYPES: Option<&AstTypesBitset> =
+        Some(&AstTypesBitset::from_types(&[AstType::JSXAttribute]));
+    const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
 }
 
 impl RuleRunner for crate::rules::unicorn::catch_error_name::CatchErrorName {
@@ -3539,8 +3554,9 @@ impl RuleRunner for crate::rules::unicorn::prefer_dom_node_remove::PreferDomNode
 
 impl RuleRunner for crate::rules::unicorn::prefer_dom_node_text_content::PreferDomNodeTextContent {
     const NODE_TYPES: Option<&AstTypesBitset> = Some(&AstTypesBitset::from_types(&[
-        AstType::IdentifierName,
-        AstType::IdentifierReference,
+        AstType::AssignmentTargetPropertyIdentifier,
+        AstType::AssignmentTargetPropertyProperty,
+        AstType::BindingProperty,
         AstType::StaticMemberExpression,
     ]));
     const RUN_FUNCTIONS: RuleRunFunctionsImplemented = RuleRunFunctionsImplemented::Run;
